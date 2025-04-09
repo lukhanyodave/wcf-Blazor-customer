@@ -1,0 +1,190 @@
+﻿@page "/admincustomer/new"
+
+@using Microsoft.AspNetCore.Authorization
+@using Rtt.Service.Abstractions
+@using Rtt.Service.Dtos
+@using Rtt.Web.Client.Model
+
+@inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
+
+@rendermode InteractiveServer
+
+@inject NavigationManager navigationManager
+@inject ICustomerService customerService
+
+
+
+
+<div class="col-lg-12">
+    @if (!string.IsNullOrEmpty(ErrorMessage))
+    {
+        <DisplayError ErrorMessage="@ErrorMessage"></DisplayError>
+    }
+    <div class="card">
+        <div class="card-body">
+            <div class="col-mb-2">
+
+            </div>
+
+            <form>
+
+                <h5 class="card-title">Create New Customer</h5>
+
+                <EditForm Model="@CurrentCustomer" OnSubmit="HandleValidSubmit" FormName="CreateUser" class="row-cols-md-8">
+                    <DataAnnotationsValidator />
+
+                    <div class="row mb-6">
+                        <label for="inputText" class="col-sm-2 col-form-label">Name:</label>
+                        <div class="col-sm-3">
+                            <InputText type="text" id="txtUserName" @bind-Value="@CurrentCustomer.Name" class="form-control" placeholder="Name"></InputText>
+                        </div>
+                    </div>
+                    <br />
+                    <div class="row mb-6">
+                        <label for="inputText" class="col-sm-2 col-form-label">Last Name:</label>
+                        <div class="col-sm-3">
+                            <InputText type="text"  id="txtUserName" @bind-Value="@CurrentCustomer.LastName" class="form-control" placeholder="LastName"></InputText>
+                        </div>
+                    </div>
+                    <br />
+                   
+
+
+
+                    <div class="row mb-6">
+                        <label for="inputText" class="col-sm-2 col-form-label">Gender:</label>
+                        <div class="col-sm-3">
+                            <InputSelect id="selectDepartment" class="form-select" @bind-Value="CurrentCustomer.Gender">
+                                <option value=""> Select Gender</option>
+                                @foreach (var gen in Genders)
+                                {
+                                    <option value="@gen.Name">@gen.Name</option>
+                                }
+                            </InputSelect>
+                        </div>
+                    </div>
+                    <br />
+
+                    <div class="row mb-6">
+                        <label for="inputText" class="col-sm-2 col-form-label">Residential Address:</label>
+                        <div class="col-sm-3">
+                            <InputText type="text"  id="txtUserName" @bind-Value="@CurrentCustomer.ResidentialAddress" class="form-control" placeholder="Address"></InputText>
+                        </div>
+
+                    </div>
+
+                    <br />
+                    <div class="row mb-6">
+                        <label for="inputText" class="col-sm-2 col-form-label">Postal Address:</label>
+                        <div class="col-sm-3">
+                            <InputText type="text"  id="txtUserName" @bind-Value="@CurrentCustomer.PostalAddress" class="form-control" placeholder="Postal Address"></InputText>
+                        </div>
+                    </div>
+
+                    <br />
+                    <div class="row mb-6">
+                        <label for="inputText" class="col-sm-2 col-form-label">Work Address:</label>
+                        <div class="col-sm-3">
+                            <InputText type="text"  id="txtUserName" @bind-Value="@CurrentCustomer.WorkAddress" class="form-control" placeholder="Work Address"></InputText>
+                        </div>
+                    </div>
+
+                    <br />
+                    <div class="row mb-6">
+                        <label for="inputText" class="col-sm-2 col-form-label">Cell:</label>
+                        <div class="col-sm-3">
+                            <InputText type="text" pattern="[0-9]{1,10}" id="txtPostalAddress" @bind-Value="@CurrentCustomer.Cell" class="form-control" placeholder="Cell"></InputText>
+
+                            <ValidationMessage For="@(() => CurrentCustomer.Cell)" class="text-danger d-block" />
+
+                        </div>
+
+                    </div>
+                    <br />
+                    <div class="row mb-6">
+                        <label for="inputText" class="col-sm-2 col-form-label">Work Number:</label>
+                        <div class="col-sm-3">
+                            <InputText type="text" pattern="[0-9]{1,10}" id="txtPostalAddress" @bind-Value="@CurrentCustomer.WorkNumber" class="form-control" placeholder="Work Number"></InputText>
+
+                            <ValidationMessage For="@(() => CurrentCustomer.WorkNumber)" class="text-danger d-block" />
+
+                        </div>
+
+                    </div>
+                    <br/>
+
+                    <br />
+
+                    <br />
+                    <div class="form-footer mt-6">
+                        <button type="submit" class="btn btn-primary">Submit</button>
+                        <button type="button" class="btn btn-light" @onclick="() => Cancel()">Cancel</button>
+                    </div>
+                </EditForm>
+            </form>
+        </div>
+    </div>
+</div>
+
+@code {
+
+
+
+    string ErrorMessage { get; set; } = string.Empty;
+    public string userExistMessage = "User Exist ,update user ...";
+    public string Filter { get; set; } = string.Empty;
+    private string searchName = string.Empty;
+    private bool isLoading;
+    public string appUserName { get; set; } = string.Empty;
+    private CustomerDto CurrentCustomer = new CustomerDto() ;
+    private List<Gender> Genders = new List<Gender>() { new Gender() { Id = 1, Name = "Male" }, new Gender() { Id = 2, Name = "Female" } };
+
+
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+         
+            isLoading = true;
+
+          
+        }
+        catch (Exception ex)
+        {
+
+        }     
+    }
+
+   
+
+    public async Task HandleValidSubmit()
+    {
+        try
+        {
+            CurrentCustomer.Id = Guid.NewGuid();
+            // CurrentCustomer.Name = true;
+            // CurrentCustomer.Last = false;
+            // bool hasDepartment = false;
+            // CurrentCustomer.Roles = new List<Guid>();
+           
+            // CurrentCustomer.CreatedBy = CurrentCustomer.CreatedBy;
+            // CurrentCustomer.DateCreated = DateTimeOffset.UtcNow;
+
+             await customerService.CreateUser(CurrentCustomer);
+        }
+        catch (Exception ex)
+        {
+            ErrorMessage = ex.Message;
+        }
+
+        navigationManager.NavigateTo($"/admincustomer");
+
+    }
+   
+    public async Task Cancel()
+    {
+        navigationManager.NavigateTo($"/admincustomer");
+    }
+}

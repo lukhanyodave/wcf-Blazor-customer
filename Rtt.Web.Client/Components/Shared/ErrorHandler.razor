@@ -1,0 +1,26 @@
+﻿@using Microsoft.Extensions.Logging
+
+@inject ILogger<ErrorHandler> _logger
+@inject IJSRuntime JSRuntime;
+
+<CascadingValue Value="this">
+    @ChildContent
+</CascadingValue>
+
+@code{
+
+    [Parameter]
+    public RenderFragment ChildContent { get; set; }
+
+    public void HandleException(Exception ex)
+    {
+        _logger.LogError(ex, ex.Message);
+        
+        //JSRuntime.InvokeVoidAsync("displayErrorUI", ex.Message);
+
+        // Call StateHasChanged if HandleException directly participates in
+        // rendering. If ProcessError only logs or records the error,
+        // there's no need to call StateHasChanged.
+        //StateHasChanged();
+    }
+}
