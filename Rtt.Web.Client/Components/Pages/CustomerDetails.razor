@@ -1,0 +1,157 @@
+﻿@page "/admincustomer/details/{Id:guid}"
+
+@using Microsoft.AspNetCore.Authorization
+@using Rtt.Service.Abstractions
+@using Rtt.Service.Dtos
+@using Rtt.Web.Client.Components.Shared
+
+@inject NavigationManager NavigationManager
+@inject ICustomerService customerService
+@rendermode InteractiveServer
+
+
+
+@if (isLoading)
+{
+
+    <div class="spinner-border" style="width: 30px; height: 30px;" role="status">
+        <span class="visually-hidden">Loading...</span>
+    </div>
+
+}
+else
+{
+    <div class="col-lg-12">
+
+        <div class="card">
+            <div class="card-body">
+
+                <h5 class="card-title">CUSTOMER DETAILS</h5>
+
+                <div class="row">
+                    <div class="col-sm-6 col-md-2 user-details-display-columns ">
+                        <label class="control-label "> Name:</label>
+                    </div>
+                    <div class="col-sm-6 col-md-10 user-details-display-name">
+                        <label>@CurrentCustomer.Name</label>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-sm-6 col-md-2 user-details-display-columns ">
+                        <label class="control-label ">Last Name :</label>
+                    </div>
+                    <div class="col-sm-6 col-md-10 user-details-display-name" Place>
+                        <label>@CurrentCustomer.LastName</label>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-sm-6 col-md-2 user-details-display-columns ">
+                        <label class="control-label ">Gender:</label>
+                    </div>
+                    <div class="col-sm-6 col-md-10 user-details-display-name">
+                        <label>@CurrentCustomer.Gender</label>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-6 col-md-2 user-details-display-columns ">
+                        <label class="control-label ">Residential Address :</label>
+                    </div>
+                    <div class="col-sm-6 col-md-10 user-details-display-name">
+                        <label>@CurrentCustomer.ResidentialAddress</label>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-6 col-md-2 user-details-display-columns ">
+                        <label class="control-label ">Postal Address :</label>
+                    </div>
+                    <div class="col-sm-6 col-md-10 user-details-display-name">
+                        <label>@CurrentCustomer.PostalAddress</label>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-6 col-md-2 user-details-display-columns">
+                        <label class="control-label">Work Address :</label>
+                    </div>
+                    <div class="col-sm-6 col-md-10 user-details-display-name">
+                        <label>@CurrentCustomer.WorkAddress</label>
+                    </div> 
+                </div>
+                <div class="row">
+                    <div class="col-sm-6 col-md-2 user-details-display-columns ">
+                        <label class="control-label ">Cell Number   :</label>
+                    </div>
+                    <div class="col-sm-6 col-md-10 user-details-display-name">
+                        <label>@CurrentCustomer.Cell</label>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-6 col-md-2 user-details-display-columns ">
+                        <label class="control-label ">Work Number :</label>
+                    </div>
+                    <div class="col-sm-6 col-md-10 user-details-display-name">
+                        <label>@CurrentCustomer.WorkNumber</label>
+                    </div>
+                </div>
+
+                
+
+                <br/>
+                <div class="row">
+                    <div class="col-12 user-details-edituser">
+                        <button @onclick="() => Edit(CurrentCustomer.Id)" class="btn btn-outline-info">EDIT USER <i class="bi bi-pencil"></i></button>
+                        <button @onclick="() => Back()" class="btn btn-outline-info">BACK</button>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+
+@code {
+
+
+
+    bool isLoading;
+    CustomerDto CurrentCustomer = new CustomerDto();
+   
+    [Parameter] public Guid Id { get; set; }
+
+    [CascadingParameter]
+    public ErrorHandler ErrorHandler { get; set; }
+
+    protected async override Task OnParametersSetAsync()
+    {
+        try
+        {
+            isLoading = true;
+            var response  = await customerService.GetById(Id);
+            if (response is not null)
+                CurrentCustomer = response; 
+
+        }
+        catch (Exception ex)
+        {
+            ErrorHandler.HandleException(ex);
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+
+    public void Edit(Guid id)
+    {
+        NavigationManager.NavigateTo("/admincustomer/edit/" + id);
+    }
+    public void Back()
+    {
+        NavigationManager.NavigateTo("/admincustomer");
+    }
+
+}
+

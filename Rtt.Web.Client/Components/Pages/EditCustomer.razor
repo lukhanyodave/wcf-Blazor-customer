@@ -1,0 +1,262 @@
+﻿@page "/admincustomer/edit/{customerId:guid}"
+
+@using Microsoft.AspNetCore.Authorization
+@using Rtt.Service.Abstractions
+@using Rtt.Service.Dtos
+@using Rtt.Web.Client.Model
+@rendermode InteractiveServer
+
+@inject NavigationManager navigationManager
+@inject ICustomerService customerService
+@inject Microsoft.AspNetCore.Http.IHttpContextAccessor HttpContextAccessor
+
+
+@if (isLoading)
+{
+    <div class="spinner-border"></div>
+    <span style="display: inline-block; vertical-align: super">Please wait, loading user details...</span>
+}
+else{
+
+    <div class="col-lg-12">
+
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Edit Customer</h5>
+                <!-- Advanced Form Elements -->
+                <form>
+
+                    <EditForm Model="@CurrentCustomer" OnValidSubmit="Save" FormName="UpdateCustomer" class="row-cols-md-8">
+                        <DataAnnotationsValidator />
+                        <div class="text-danger"><ValidationSummary /></div>
+                        <div class="row mb-3">
+                            <label for="inputText" class="col-sm-2 col-form-label">Name:</label>
+                            <div class="col-sm-3">
+                                <InputText   type="text" id="txtUserName" @bind-Value="@CurrentCustomer.Name" class="form-control" placeholder="UserName"></InputText>
+
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <label for="inputText" class="col-sm-2 col-form-label">Last Name:</label>
+                            <div class="col-sm-3">
+                                <InputText  type="text" id="txtDisplay_Name" @bind-Value="@CurrentCustomer.LastName" class="form-control" placeholder="Display_Name"></InputText>
+
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <label for="inputText" class="col-sm-2 col-form-label">Gender:</label>
+                            <div class="col-sm-3">
+                                
+                                <InputSelect id="selectDepartment" class="form-select" @bind-Value="CurrentCustomer.Gender">
+                                    @if (Genders != null)
+                                    {
+                                        @foreach (var gen in Genders)
+                                        {
+                                            <option value="@gen.Name">@gen.Name</option>
+                                        }
+                                    }
+                                </InputSelect>
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <label for="inputText" class="col-sm-2 col-form-label">Residential Address:</label>
+                            <div class="col-sm-3">
+                                <InputText  type="text" id="txtDisplay_Name" @bind-Value="@CurrentCustomer.ResidentialAddress" class="form-control" placeholder="Display_Name"></InputText>
+
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <label for="inputText" class="col-sm-2 col-form-label">Postal Address:</label>
+                            <div class="col-sm-3">
+                                <InputText  type="text" id="txtDisplay_Name" @bind-Value="@CurrentCustomer.PostalAddress" class="form-control" placeholder="Display_Name"></InputText>
+
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <label for="inputText" class="col-sm-2 col-form-label">Work Address:</label>
+                            <div class="col-sm-3">
+                                <InputText  type="text" id="txtDisplay_Name" @bind-Value="@CurrentCustomer.WorkAddress" class="form-control" placeholder="Display_Name"></InputText>
+
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <label for="inputText" class="col-sm-2 col-form-label">Cell Number:</label>
+                            <div class="col-sm-3">
+                                <InputText type="text" pattern="[0-9]{1,10}" size="4" id="txtDisplay_Name" @bind-Value="@CurrentCustomer.Cell" class="form-control" placeholder="Contact Number"></InputText>
+                                <ValidationMessage For="@(() => CurrentCustomer.Cell)" class="text-danger d-block" />
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <label for="inputText" class="col-sm-2 col-form-label">Work Number:</label>
+                            <div class="col-sm-3">
+                                <InputText type="text" pattern="[0-9]{1,10}" size="4" id="txtDisplay_Name" @bind-Value="@CurrentCustomer.WorkNumber" class="form-control" placeholder="Contact Number"></InputText>
+                                <ValidationMessage For="@(() => CurrentCustomer.WorkNumber)" class="text-danger d-block" />
+                            </div>
+                        </div>
+                        @*  <div class="row mb-3">
+                            <label for="inputText" class="col-sm-2 col-form-label">Contact Number:</label>
+                            <div class="col-sm-3">
+                                <InputText type="text" pattern="[0-9]{1,10}" size="4" id="txtDisplay_Name" @bind-Value="@CurrentCustomer.Cell.ToString()" class="form-control" placeholder="Contact Number"></InputText>
+                                <ValidationMessage For="@(() => CurrentCustomer.Cell)" class="text-danger d-block" />
+                            </div>
+                        </div> *@
+                        <br />
+                        @* <div class="form-group mb-3">
+                            <label class="row-cols-md-5">Is Admin :</label>
+                            <InputCheckbox id="txtEmail" @bind-Value="@CurrentCustomer.Is_Admin" class="form-check-input " placeholder="displayName"></InputCheckbox>
+                        </div>
+                        <br /> *@
+
+                      @*   <div class="form-group mb-3">
+                            <label class="row-cols-md-5">Active  :</label>
+                            <InputCheckbox id="txtEmail" @bind-Value="@CurrentCustomer.Active" class="form-check-input " placeholder="displayName"></InputCheckbox>
+                        </div> *@
+                       @*  <div class="row mb-6">
+                            <label class="col-sm-2 col-form-label"> Select Roles :</label>
+                            <div class="col-sm-3">
+                                <table>
+                                    @foreach (var role in CurrentCustomer.SelectedRoles)
+                                    {
+                                        <tr>
+                                            <td width="250px">@role.RoleName</td>
+                                            <td>
+                                                <InputCheckbox class="form-check-input"
+                                                @bind-Value="role.IsSelected">
+                                                </InputCheckbox>
+                                            </td>
+                                        </tr>
+                                    }
+                                </table>
+                            </div>
+                        </div> *@
+                        <br />
+                       @*  @if (CurrentCustomer.SelectedRoles.Any(x => (x.RoleName == PolicyNames.DepHead && x.IsSelected)
+                          || (x.RoleName == PolicyNames.DepCoOrdinator && x.IsSelected)
+                          || (x.RoleName == PolicyNames.Supervisor && x.IsSelected)))
+                        {
+                            <div class="row mb-6">
+                                <label class="col-sm-2 col-form-label">Select Department :</label>
+                                <div class="col-sm-3">
+                                    <InputSelect id="selectFaculty" class="form-select"
+                                    ValueExpression="@(()=>CurrentCustomer.FacultyId)"
+                                    Value="@CurrentCustomer.FacultyId"
+                                    ValueChanged="@((Guid value) => OnFacultyChanged(value))">
+                                        @foreach (var faculty in faculties)
+                                        {
+                                            <option value="@faculty.Id">@faculty.FacultyName</option>
+                                        }
+                                    </InputSelect>
+                                </div>
+                                <div class="col-sm-3">
+                                    <InputSelect id="selectDepartment" class="form-select" @bind-Value="CurrentCustomer.DepartmentId">
+                                        <option value=@Guid.Empty> Select Department</option>
+                                        @foreach (var dept in departments)
+                                        {
+                                            <option value="@dept.Id">@dept.DepartmentName</option>
+                                        }
+                                    </InputSelect>
+                                </div>
+                            </div>
+                        }
+                        <br /> *@
+
+                        <div class="form-check small mb-3 offset-sm-1 required" style="position:relative; left: 1.5ex;">
+                            <!-- input and label -->
+                        </div>
+
+                        <div class="form-footer mt-6">
+                            <button type="submit" class="btn btn-primary">Submit</button>
+                            <button type="button" class="btn btn-light" @onclick="CancelEdit">Cancel</button>
+                        </div>
+
+
+                    </EditForm>
+
+                </form>
+            </div>
+        </div>
+    </div>
+}
+
+
+
+@code {
+
+    bool isLoading;
+    CustomerDto CurrentCustomer = new CustomerDto();
+    private CustomerDto? updateCustomer { get; set; }
+    [Parameter]
+    public Guid customerId { get; set; }
+    private List<Gender> Genders = new List<Gender>() { new Gender() { Id = 1, Name = "Male" }, new Gender() { Id = 2, Name = "Female" } };
+
+
+    protected async override Task OnInitializedAsync()
+    {
+        try
+        {
+            isLoading = true;
+
+            // Get the customer
+            var response = await customerService.GetById(customerId);
+            if (response is not null)
+                CurrentCustomer = response;
+        }
+        catch (Exception ex)
+        {
+           // ErrorHandler.HandleException(ex);
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    // private async Task OnFacultyChanged(Guid value)
+    // {
+    //     // Assign the selected value to the Model
+    //     CurrentCustomer.FacultyId = value;
+    //     CurrentCustomer.DepartmentId = Guid.Empty;
+
+    //     // Get the faculty departments
+    //     departments = await departmentService.GetDepartmentsByFacultyId(CurrentCustomer.FacultyId);
+    //     if (departments != null && departments.Count > 0)
+    //     {
+    //         CurrentCustomer.DepartmentId = departments.First().Id;
+    //     }
+    // }
+
+    public void CancelEdit()
+    {
+        navigationManager.NavigateTo($"/admincustomer");
+    }
+
+    public async Task Save()
+    {
+        try
+        {
+            if (CurrentCustomer.Id != Guid.Empty)
+            {
+                updateCustomer = new CustomerDto()
+                {
+                    Id = CurrentCustomer.Id,
+                    Name = CurrentCustomer.Name,
+                    LastName = CurrentCustomer.LastName,
+                    Gender = CurrentCustomer.Gender,
+                    ResidentialAddress = CurrentCustomer.ResidentialAddress,
+                    PostalAddress =  CurrentCustomer.PostalAddress,
+                    WorkAddress = CurrentCustomer.WorkAddress,
+                    Cell = CurrentCustomer.Cell,
+                    WorkNumber = CurrentCustomer.WorkNumber
+                };
+                
+                await customerService.UpdateUser(updateCustomer);
+                navigationManager.NavigateTo($"/admincustomer");
+            }
+        }
+        catch (Exception ex)
+        {
+            
+        }
+    }     
+
+}

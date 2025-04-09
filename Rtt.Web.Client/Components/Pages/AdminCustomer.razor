@@ -1,0 +1,142 @@
+﻿@page "/admincustomer"
+@using Rtt.Service.Abstractions
+@using Rtt.Service.Dtos
+@using ServiceReference1
+@inject ICustomerService customerService
+@inject NavigationManager navigationManager
+
+
+@rendermode InteractiveServer
+
+<PageTitle>User Management </PageTitle>
+
+
+
+<div class="card card-default">
+    <div class="card-body">
+        <h5 class="card-title"> Customer Management </h5>
+        <br />
+        <div>
+            <button @onclick="() => Create()" class="btn btn-outline-info">Create Customer <i class="bi bi-person-add"></i></button>
+        </div>
+        <br />
+
+        @if (Customers == null)
+        {
+            <div class="spinner-border" style="width: 30px; height: 30px;" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+        }
+        else if (Customers.Count == 0)
+        {
+            <div>
+                <span>No customers...</span>
+            </div>
+        }
+        else
+        {
+            <div>
+                <!-- Table with stripped rows -->
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>LastName</th>
+                            <th>Gender</th>
+                            <th>Residential</th>
+                            <th>Postal</th>
+                            <th>Work</th>
+                            <th>Cell</th>
+                            <th>Work Number </th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var cust in Customers)
+                        {
+                            <tr>
+                                @*  <td>@user.Id.ToString().Substring(0, 5) ...</td> *@
+                                <td>@cust.Name</td>
+                                <td>@cust.LastName</td>
+                                <td>@cust.Gender</td>
+                                <td>@cust.ResidentialAddress</td>
+                                <td>@cust.PostalAddress</td>
+                                <td>@cust.WorkAddress</td>
+                                <td>@cust.Cell</td>
+                                <td>@cust.WorkNumber</td>
+                                <td>
+
+                                    <button @onclick="() => View(cust.Id)" class="btn btn-outline-info">View <i class="bi bi-binoculars-fill"></i></button>
+                                    <button @onclick="(()=> EditUser(cust.Id))" class="btn btn-outline-info">Edit <i class="bi bi-pencil"></i></button>
+                                </td>
+                                <td>
+
+                                    @*  <button @onclick="() => Delete(user.Id, user.Display_Name)"  >DELETE<i class="bi bi-trash"></i></button>                          *@
+                                </td>
+                                <td>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
+    </div>
+</div>
+
+@code {
+
+    bool isLoading;
+    List<CustomerContract> Customers = new List<CustomerContract>();
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            isLoading = true;
+
+            Customers = await customerService.GetAll();
+
+            if (Customers != null)
+            {
+                Customers = Customers.OrderBy(x => x.Name).ToList();
+
+                // Metadata = new PagingMetadata
+                //     {
+                //         CurrentPage = 1,
+                //         PageSize = pageSize,
+                //     // TotalCount = allUsers.Count,
+                //     // TotalPages = allUsers.Count / pageSize
+                //     };
+
+                // RefreshUserList();
+                //userList = allUsers.OrderBy(u => u.displayName).Take(pageSize).ToList();
+            }
+        }
+        catch (Exception ex)
+        {
+            // ErrorHandler.HandleException(ex);
+        }
+        finally
+        {
+
+        }
+    }
+
+    public void EditUser(Guid id)
+    {
+        navigationManager.NavigateTo($"/admincustomer/edit/{id}");
+
+    }
+    public void Create()
+    {
+        navigationManager.NavigateTo($"/admincustomer/new");
+        //navigationManager.NavigateTo($"/useradmin/new");
+
+    }
+
+    public void View(Guid id)
+    {
+        navigationManager.NavigateTo($"/admincustomer/details/" + id);
+    }
+
+}

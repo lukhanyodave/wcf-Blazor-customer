@@ -1,0 +1,17 @@
+﻿@page "/"
+@using Rtt.Service.Abstractions
+@using Rtt.Service.Dtos
+@using ServiceReference1
+@inject ICustomerService customerService
+@inject NavigationManager navigationManager
+
+@code{
+    protected override void OnInitialized()
+    {
+        navigationManager.NavigateTo($"/admincustomer");
+    }
+}
+
+
+
+
